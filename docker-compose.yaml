@@ -12,10 +12,10 @@ services:
 
   django_redis:
     image: redis
-    container_name: django_redis  
+    container_name: django_redis
     ports:
       - 6379:6379
-  
+
   #Database
   django_db:
     image: postgres
