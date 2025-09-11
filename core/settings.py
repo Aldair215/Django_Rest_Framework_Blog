@@ -26,6 +26,8 @@ environ.Env.read_env()
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env("SECRET_KEY")
 
+VALID_API_KEYS = env.str("VALID_API_KEYS").split(",")
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -45,15 +47,133 @@ DJANGO_APPS = [
 
 PROJECT_APPS = [
     'apps.blog',
+    'apps.media',
 ]
 
 THIRD_PARTY_APPS = [
     'rest_framework',
+    'rest_framework_api',
     'channels',
-]
+    'ckeditor',
+    'ckeditor_uploader',
+    'django_celery_results',
+    'django_celery_beat',
+    'storages',
+    ]
 
 INSTALLED_APPS = DJANGO_APPS + PROJECT_APPS + THIRD_PARTY_APPS
 
+
+
+# STATIC_LOCATION = "/static/"
+# STATIC_URL = '/static/'
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+# MEDIA_URL = '/media/'
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+CKEDITOR_CONFIGS = {"default": {"toolbar": "full", "autoParagraph": False}}
+CKEDITOR_UPLOAD_PATH = "media/"
+
+# CKEDITOR_5_CUSTOM_CSS = 'css/ckeditor5/admin_dark_mode_fix.css'
+
+# customColorPalette = [
+#         {
+#             'color': 'hsl(4, 90%, 58%)',
+#             'label': 'Red'
+#         },
+#         {
+#             'color': 'hsl(340, 82%, 52%)',
+#             'label': 'Pink'
+#         },
+#         {
+#             'color': 'hsl(291, 64%, 42%)',
+#             'label': 'Purple'
+#         },
+#         {
+#             'color': 'hsl(262, 52%, 47%)',
+#             'label': 'Deep Purple'
+#         },
+#         {
+#             'color': 'hsl(231, 48%, 48%)',
+#             'label': 'Indigo'
+#         },
+#         {
+#             'color': 'hsl(207, 90%, 54%)',
+#             'label': 'Blue'
+#         },
+#     ]
+
+
+# CKEDITOR_5_CONFIGS = {
+#     'default': {
+#         'toolbar': {
+#             'items': ['heading', '|', 'bold', 'italic', 'link',
+#                       'bulletedList', 'numberedList', 'blockQuote', 'imageUpload', ],
+#                     }
+
+#     },
+    
+#     'extends': {
+#         'blockToolbar': [
+#             'paragraph', 'heading1', 'heading2', 'heading3',
+#             '|',
+#             'bulletedList', 'numberedList',
+#             '|',
+#             'blockQuote',
+#         ],
+#         '   ': {
+#             'items': ['heading', '|', 'outdent', 'indent', '|', 'bold', 'italic', 'link', 'underline', 'strikethrough',
+#                       'code','subscript', 'superscript', 'highlight', '|', 'codeBlock', 'sourceEditing', 'insertImage',
+#                     'bulletedList', 'numberedList', 'todoList', '|',  'blockQuote', 'imageUpload', '|',
+#                     'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor', 'mediaEmbed', 'removeFormat',
+#                     'insertTable',
+#                     ],
+#             'shouldNotGroupWhenFull': 'true'
+#         },
+#         'image': {
+#             'toolbar': ['imageTextAlternative', '|', 'imageStyle:alignLeft',
+#                         'imageStyle:alignRight', 'imageStyle:alignCenter', 'imageStyle:side',  '|'],
+#             'styles': [
+#                 'full',
+#                 'side',
+#                 'alignLeft',
+#                 'alignRight',
+#                 'alignCenter',
+#             ]
+
+#         },
+#         'table': {
+#             'contentToolbar': [ 'tableColumn', 'tableRow', 'mergeTableCells',
+#             'tableProperties', 'tableCellProperties' ],
+#             'tableProperties': {
+#                 'borderColors': customColorPalette,
+#                 'backgroundColors': customColorPalette
+#             },
+#             'tableCellProperties': {
+#                 'borderColors': customColorPalette,
+#                 'backgroundColors': customColorPalette
+#             }
+#         },
+#         'heading' : {
+#             'options': [
+#                 { 'model': 'paragraph', 'title': 'Paragraph', 'class': 'ck-heading_paragraph' },
+#                 { 'model': 'heading1', 'view': 'h1', 'title': 'Heading 1', 'class': 'ck-heading_heading1' },
+#                 { 'model': 'heading2', 'view': 'h2', 'title': 'Heading 2', 'class': 'ck-heading_heading2' },
+#                 { 'model': 'heading3', 'view': 'h3', 'title': 'Heading 3', 'class': 'ck-heading_heading3' }
+#             ]
+#         }
+#     },
+#     'list': {
+#         'properties': {
+#             'styles': 'true',
+#             'startIndex': 'true',
+#             'reversed': 'true',
+#         }
+#     }
+# }
+# # Define a constant in settings.py to specify file upload permissions
+# CKEDITOR_5_FILE_UPLOAD_PERMISSION = "any" 
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -71,7 +191,7 @@ ROOT_URLCONF = 'core.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -137,9 +257,6 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_LOCATION = "static/"
-STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 
 # Default primary key field type
@@ -151,7 +268,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticatedOrReadOnly', # Permite que los usuarios autenticados puedan escribir, pero los no autenticados solo pueden leer
+        'rest_framework.permissions.AllowAny', # Permite que los usuarios autenticados puedan escribir, pero los no autenticados solo pueden leer
     ],
 }
 
@@ -164,7 +281,9 @@ CHANNEL_LAYERS = {
     }
 }
 
-CASHES = {
+REDIS_HOST = env("REDIS_HOST")
+
+CACHES = {
     "default":{
         "BACKEND": "django_redis.cache.RedisCache",
         "LOCATION": env("REDIS_URL"),
@@ -178,3 +297,71 @@ CHANNELS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]
+
+#Definiendo configuraciones para Celery
+
+CELERY_ACCEPT_CONTENT = ["json"] # se usara json como el serializador de mensajes predeterminado
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TIMEZONE = "America/Santiago"
+
+CELERY_BROKER_URL = env("REDIS_URL") # tenemos que trabajar con un broker en este caso celery trabaja con redis
+CELERY_BROKER_TRANSPORT_OPTIONS = {
+    "visibility_timeout": 3600,
+    "socket_timeout": 5,
+    "retry_on_timeout": True,
+}
+
+CELERY_RESULT_BACKEND = "django-db"
+CELERY_CACHE_BACKEND = "default"
+
+CELERY_IMPORTS = (
+    "core.tasks",
+    "apps.blog.tasks",
+)
+
+#Celery Beat pide que definamos lo siguiente:
+
+CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
+CELERY_BEAT_SCHEDULE = {}
+
+#Configuración de CLOUD FRONT
+AWS_CLOUDFRONT_DOMAIN=env("AWS_CLOUDFRONT_DOMAIN")
+AWS_CLOUDFRONT_KEY_ID=env.str("AWS_CLOUDFRONT_KEY_ID").strip()
+AWS_CLOUDFRONT_KEY=env.str("AWS_CLOUDFRONT_KEY", multiline=True).encode('ascii').strip()
+
+#Configuramos aws s3 para manejar los archivos estaticos y media
+AWS_ACCESS_KEY_ID=env("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY=env("AWS_SECRET_ACCESS_KEY")
+AWS_STORAGE_BUCKET_NAME=env("AWS_STORAGE_BUCKET_NAME")
+AWS_S3_REGION_NAME=env("AWS_S3_REGION_NAME")
+AWS_S3_CUSTOM_DOMAIN=AWS_CLOUDFRONT_DOMAIN
+AWS_S3_DOMAIN=f"{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com"
+
+
+#Configuración de seguridad y permisos
+AWS_QUERYSTRING_AUTH=False #Deshabilita las firmas en las URLS (archivos públicos)
+AWS_FILE_OVERWRITE=False #Evita sobrescribir archivos con el mismo nombre
+AWS_DEFAULT_ACL=None #Hace que los archivos subidos sean públicos
+AWS_QUERYSTRING_EXPIRE=5 #Tiempo de expiración de las URL firmadas en segundos
+
+#Parametros adicionales para los objetos S3
+AWS_S3_OBJECT_PARAMETERS={
+    'CacheControl': 'max-age=86400', #Habilita el almacenamiento en caché por 1 día
+}
+
+#Configuración de archivos estáticos
+STATIC_LOCATION = "static"
+STATIC_URL = f"{AWS_S3_DOMAIN}/{STATIC_LOCATION}/"
+STATICFILES_STORAGE = "core.storage_backends.StaticStorage"
+STATIC_ROOT = STATIC_URL
+
+#Configuración de archivos medios
+MEDIA_LOCATION = "media"
+MEDIA_URL = f"{AWS_S3_CUSTOM_DOMAIN}/{MEDIA_LOCATION}/"
+MEDIA_ROOT = MEDIA_URL
+#Configuración de almacenamiento predeterminado
+DEFAULT_FILE_STORAGE="core.storage_backends.PublicMediaStorage"
+
+
+
